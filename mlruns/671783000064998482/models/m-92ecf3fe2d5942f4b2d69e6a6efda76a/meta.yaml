@@ -1,0 +1,10 @@
+artifact_location: file:///mnt/c/Users/under/Documents/F5/3_Projects/Stroker_project/mlruns/671783000064998482/models/m-92ecf3fe2d5942f4b2d69e6a6efda76a/artifacts
+creation_timestamp: 1776418458442
+experiment_id: '671783000064998482'
+last_updated_timestamp: 1776418465351
+model_id: m-92ecf3fe2d5942f4b2d69e6a6efda76a
+model_type: null
+name: LogisticRegression
+source_run_id: 0ac0c499048f406abe912abbe540200a
+status: 2
+status_message: null

@@ -1,0 +1,14 @@
+artifact_uri: file:///mnt/c/Users/under/Documents/F5/3_Projects/Stroker_project/mlruns/671783000064998482/54e8786e45f5401d9ad450a1a23eb8a7/artifacts
+end_time: 1776418502752
+entry_point_name: ''
+experiment_id: '671783000064998482'
+lifecycle_stage: active
+run_id: 54e8786e45f5401d9ad450a1a23eb8a7
+run_name: RandomForest_adults_smote=True
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1776418492551
+status: 3
+tags: []
+user_id: under
