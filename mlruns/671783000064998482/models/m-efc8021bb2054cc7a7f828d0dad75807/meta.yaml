@@ -1,0 +1,10 @@
+artifact_location: file:///mnt/c/Users/under/Documents/F5/3_Projects/Stroker_project/mlruns/671783000064998482/models/m-efc8021bb2054cc7a7f828d0dad75807/artifacts
+creation_timestamp: 1776372274241
+experiment_id: '671783000064998482'
+last_updated_timestamp: 1776372279470
+model_id: m-efc8021bb2054cc7a7f828d0dad75807
+model_type: null
+name: Logistic
+source_run_id: 6597794af28843b4996ad96d497d5e3f
+status: 2
+status_message: null

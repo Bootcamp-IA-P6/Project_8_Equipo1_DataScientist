@@ -1,0 +1,14 @@
+artifact_uri: file:///mnt/c/Users/under/Documents/F5/3_Projects/Stroker_project/mlruns/671783000064998482/4f4f796c7abb472382ffaeccce38c366/artifacts
+end_time: 1776372266892
+entry_point_name: ''
+experiment_id: '671783000064998482'
+lifecycle_stage: active
+run_id: 4f4f796c7abb472382ffaeccce38c366
+run_name: indecisive-squid-517
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1776372259372
+status: 3
+tags: []
+user_id: under
