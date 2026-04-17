@@ -1,0 +1,23 @@
+artifact_path: file:///mnt/c/Users/under/Documents/F5/3_Projects/Stroker_project/mlruns/671783000064998482/models/m-08d474785c26418c99e1c13434a17779/artifacts
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.10.20
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.7.2
+    skops_trusted_types: null
+mlflow_version: 3.11.1
+model_id: m-08d474785c26418c99e1c13434a17779
+model_size_bytes: 2889
+model_uuid: m-08d474785c26418c99e1c13434a17779
+prompts: null
+run_id: df6a44db83ef450da5f38832e7ae80d3
+utc_time_created: '2026-04-17 09:34:07.255278'
