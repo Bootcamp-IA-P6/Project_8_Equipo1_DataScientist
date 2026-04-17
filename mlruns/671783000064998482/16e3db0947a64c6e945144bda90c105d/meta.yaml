@@ -1,0 +1,14 @@
+artifact_uri: file:///mnt/c/Users/under/Documents/F5/3_Projects/Stroker_project/mlruns/671783000064998482/16e3db0947a64c6e945144bda90c105d/artifacts
+end_time: 1776372287867
+entry_point_name: ''
+experiment_id: '671783000064998482'
+lifecycle_stage: active
+run_id: 16e3db0947a64c6e945144bda90c105d
+run_name: bald-koi-806
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1776372279739
+status: 3
+tags: []
+user_id: under
