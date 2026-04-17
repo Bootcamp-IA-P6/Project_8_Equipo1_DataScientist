@@ -1,0 +1,10 @@
+artifact_location: file:///mnt/c/Users/under/Documents/F5/3_Projects/Stroker_project/mlruns/671783000064998482/models/m-ac209826e3ac4a86bae74a66f52ea956/artifacts
+creation_timestamp: 1776418468270
+experiment_id: '671783000064998482'
+last_updated_timestamp: 1776418474948
+model_id: m-ac209826e3ac4a86bae74a66f52ea956
+model_type: null
+name: RandomForest
+source_run_id: b76d0e871c6e41a3be73b51e341c35dc
+status: 2
+status_message: null
