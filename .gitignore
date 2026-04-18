@@ -33,6 +33,11 @@ __pycache__/
 # C extensions
 *.so
 
+# Jony
+02_modeling_v2.ipynb
+/mlruns/*
+/assets/*
+
 # Distribution / packaging
 .Python
 build/
