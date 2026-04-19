@@ -37,6 +37,8 @@ __pycache__/
 02_modeling_v2.ipynb
 /mlruns/*
 /assets/*
+02_modeling_final.ipynb
+03_optuna_v1.ipynb
 
 # Distribution / packaging
 .Python
