@@ -39,6 +39,7 @@ __pycache__/
 /assets/*
 02_modeling_final.ipynb
 03_optuna_v1.ipynb
+reports/
 
 # Distribution / packaging
 .Python
