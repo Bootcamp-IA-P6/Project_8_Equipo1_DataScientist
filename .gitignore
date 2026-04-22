@@ -198,7 +198,19 @@ mlflow.db
 
 
 #GEMA
-assets/gema-v2/
+
+
+# permitir la carpeta
+
+
+# ignorar todo dentro
+assets/*
+
+# permitir carpeta v2
+!assets/v2/
+
+# permitir TODO lo que hay dentro de v2
+!assets/v2/**
 
 # Ignorar todo mlruns
 mlruns/
