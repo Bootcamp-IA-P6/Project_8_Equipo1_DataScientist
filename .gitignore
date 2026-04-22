@@ -34,7 +34,7 @@ __pycache__/
 *.so
 
 # Jony
-02_modeling_v2.ipynb
+02_modeling_vfin.ipynb
 /mlruns/*
 /assets/*
 02_modeling_final.ipynb
