@@ -1,0 +1,14 @@
+artifact_uri: file:///mnt/c/Users/under/Documents/F5/3_Projects/Stroker_project/mlruns/671783000064998482/248793652a7d40d9893c6c1c919cc1a0/artifacts
+end_time: 1776447421930
+entry_point_name: ''
+experiment_id: '671783000064998482'
+lifecycle_stage: active
+run_id: 248793652a7d40d9893c6c1c919cc1a0
+run_name: XGBoost_full_v2
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1776447421560
+status: 3
+tags: []
+user_id: gemit
