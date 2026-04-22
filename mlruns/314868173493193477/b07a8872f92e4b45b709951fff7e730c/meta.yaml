@@ -1,0 +1,15 @@
+artifact_uri: file:///c:\Users\gemit\Desktop\factoria-ia\PROYECTOS\Project_8_Equipo1\mlruns/314868173493193477/b07a8872f92e4b45b709951fff7e730c/artifacts
+end_time: 1776855287482
+entry_point_name: ''
+experiment_id: '314868173493193477'
+lifecycle_stage: active
+run_id: b07a8872f92e4b45b709951fff7e730c
+run_name: LogisticRegression_full_optimized_v2
+run_uuid: b07a8872f92e4b45b709951fff7e730c
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1776855281127
+status: 3
+tags: []
+user_id: gemit
