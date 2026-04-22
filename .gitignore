@@ -195,4 +195,20 @@ pyrightconfig.json
 # End of https://www.toptal.com/developers/gitignore/api/python,jupyternotebooks,dotenv
 
 mlflow.db
-mlruns
+
+
+#GEMA
+assets/gema-v2/
+
+# Ignorar todo mlruns
+mlruns/
+
+# Permitir entrar en la carpeta
+!mlruns/
+
+# Ignorar todo lo de dentro
+mlruns/*
+
+# 👉 PERMITIR SOLO ESTE EXPERIMENTO
+!mlruns/314868173493193477/
+!mlruns/314868173493193477/**
