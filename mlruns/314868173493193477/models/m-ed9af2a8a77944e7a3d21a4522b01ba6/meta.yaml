@@ -1,0 +1,10 @@
+artifact_location: file:///mnt/c/Users/under/Documents/F5/3_Projects/Stroker_project/mlruns/314868173493193477/models/m-ed9af2a8a77944e7a3d21a4522b01ba6/artifacts
+creation_timestamp: 1776946380523
+experiment_id: '314868173493193477'
+last_updated_timestamp: 1776946384414
+model_id: m-ed9af2a8a77944e7a3d21a4522b01ba6
+model_type: null
+name: XGB_optuna
+source_run_id: 4e26b36377e34833861b6a0699dd3f73
+status: 2
+status_message: null

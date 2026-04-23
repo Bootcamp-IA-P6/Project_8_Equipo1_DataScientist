@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 
 
-def save_artifacts(pipeline, threshold, metrics, config):
+def save_artifacts(pipeline, threshold, metrics, config, feature_info):
 
     MODEL_DIR = Path("models")
     MODEL_DIR.mkdir(exist_ok=True)
@@ -26,6 +26,7 @@ def save_artifacts(pipeline, threshold, metrics, config):
         "threshold": threshold,
         "metrics": metrics,
         "features": list(pipeline.feature_names_in_),
+        "feature_info": feature_info,
         "scale_pos_weight": config["scale_pos_weight"]
     }
 

@@ -56,6 +56,27 @@ def train():
     print("\n🧠 Entrenando modelo...")
     pipeline.fit(X_train, y_train)
 
+
+    # ── FEATURE INFO (para Streamlit) ──
+    print("\n🧩 Generando feature_info...")
+
+    feature_info = {}
+
+    for col in X_train.columns:
+        if X_train[col].dtype == "object":
+            feature_info[col] = {
+                "type": "categorical",
+                "values": sorted(list(X_train[col].dropna().unique()))
+            }
+        else:
+            feature_info[col] = {
+                "type": "numeric",
+                "min": float(X_train[col].min()),
+                "max": float(X_train[col].max())
+            }
+
+    print("✔ feature_info generado")
+
     # ── EVALUACIÓN ──
     print("\n📈 Evaluación en TEST")
     metrics, y_pred, y_prob = evaluate_model(
@@ -69,21 +90,19 @@ def train():
         print(f"{k:12s}: {v:.4f}")
 
     # ── MLFlow ──
-    """
-    log_to_mlflow(
-    config=MODEL_CONFIG,
-    metrics=metrics,
-    pipeline=pipeline,
-    y_test=y_test,
-    y_pred=y_pred,
-    y_prob=y_prob)
-    """
+    
+    log_to_mlflow(config = MODEL_CONFIG,
+    metrics = metrics, pipeline = pipeline,
+    y_test = y_test, y_pred = y_pred,
+    y_prob = y_prob)
+    
     # ── SAVE ──
     save_artifacts(
         pipeline,
         threshold=MODEL_CONFIG["threshold"],
         metrics=metrics,
-        config=MODEL_CONFIG
+        config=MODEL_CONFIG,
+        feature_info=feature_info        
     )
 
     print("\n✅ Pipeline completo")
