@@ -223,7 +223,10 @@ assets/*
 !mlruns/
 
 # Ignorar todo lo de dentro
-mlruns/
+mlruns/163802690665606012/**
+mlruns/671783000064998482/**
+mlruns/801261444467686969/**
+
 # 👉 PERMITIR SOLO ESTE EXPERIMENTO
-!mlruns/314868173493193477/
-mlruns/314868173493193477/**
+#!mlruns/314868173493193477/
+#mlruns/314868173493193477/**

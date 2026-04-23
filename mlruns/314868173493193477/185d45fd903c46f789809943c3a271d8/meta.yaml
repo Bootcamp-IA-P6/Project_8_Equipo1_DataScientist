@@ -1,0 +1,15 @@
+artifact_uri: file:///mnt/c/Users/under/Documents/F5/3_Projects/Stroker_project/mlruns/314868173493193477/185d45fd903c46f789809943c3a271d8/artifacts
+end_time: 1776934732518
+entry_point_name: ''
+experiment_id: '314868173493193477'
+lifecycle_stage: active
+run_id: 185d45fd903c46f789809943c3a271d8
+run_name: Iris_LogisticRegression_optuna_full_smote=False
+run_uuid: 185d45fd903c46f789809943c3a271d8
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1776934724414
+status: 3
+tags: []
+user_id: Coder
