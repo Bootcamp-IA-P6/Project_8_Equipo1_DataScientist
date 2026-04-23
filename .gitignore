@@ -34,6 +34,14 @@ __pycache__/
 # C extensions
 *.so
 
+# Jony
+02_modeling_vfin.ipynb
+/mlruns/modelos
+/mlruns/0
+02_modeling_final.ipynb
+03_optuna_v1.ipynb
+reports/
+
 # Distribution / packaging
 .Python
 build/
@@ -195,6 +203,28 @@ pyrightconfig.json
 
 # End of https://www.toptal.com/developers/gitignore/api/python,jupyternotebooks,dotenv
 
+mlflow.db
+
+
+# ignorar todo dentro
+assets/*
+
+# permitir carpeta v2
+!assets/v2/
+!assets/v1/
+
+# permitir TODO lo que hay dentro de v2
+!assets/v2/**
+!assets/v1/**
+
+# Permitir entrar en la carpeta
+!mlruns/
+
+# Ignorar todo lo de dentro
+
+# 👉 PERMITIR SOLO ESTE EXPERIMENTO
+!mlruns/314868173493193477/
+!mlruns/314868173493193477/**
 # ── MLflow ──────────────────────────────────────────────────────
 mlflow.db
 mlruns/

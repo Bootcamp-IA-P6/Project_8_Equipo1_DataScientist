@@ -1,0 +1,15 @@
+artifact_uri: file:///c:\Users\gemit\Desktop\factoria-ia\PROYECTOS\Project_8_Equipo1\mlruns/314868173493193477/574775d9945049adb421c6084af80d59/artifacts
+end_time: 1776855518285
+entry_point_name: ''
+experiment_id: '314868173493193477'
+lifecycle_stage: active
+run_id: 574775d9945049adb421c6084af80d59
+run_name: XGBoost_full_optimized_v2_final
+run_uuid: 574775d9945049adb421c6084af80d59
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1776855511733
+status: 3
+tags: []
+user_id: gemit
