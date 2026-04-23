@@ -2,7 +2,7 @@
 .env
 __pycache__
 .DS_Store
-
+.vscode
 
 # Created by https://www.toptal.com/developers/gitignore/api/python,jupyternotebooks,dotenv
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,jupyternotebooks,dotenv
