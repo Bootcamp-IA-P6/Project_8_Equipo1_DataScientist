@@ -2,7 +2,7 @@
 .env
 __pycache__
 .DS_Store
-
+.vscode
 
 # Created by https://www.toptal.com/developers/gitignore/api/python,jupyternotebooks,dotenv
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,jupyternotebooks,dotenv
@@ -206,37 +206,16 @@ pyrightconfig.json
 mlflow.db
 
 
-# ignorar todo dentro
-assets/*
-
-# permitir carpeta v2
-!assets/v2/
-!assets/v1/
-
-# permitir TODO lo que hay dentro de v2
-!assets/v2/**
-!assets/v1/**
-
 # Permitir entrar en la carpeta
 !mlruns/
 
 # Ignorar todo lo de dentro
+mlruns/163802690665606012/**
+mlruns/671783000064998482/**
+mlruns/801261444467686969/**
+mlruns/931021681281009593
+
 
 # 👉 PERMITIR SOLO ESTE EXPERIMENTO
-!mlruns/314868173493193477/
-!mlruns/314868173493193477/**
-# ── MLflow ──────────────────────────────────────────────────────
-mlflow.db
-mlruns/
-!mlruns/712331539594497428/
-!mlruns/712331539594497428/meta.yaml
-!mlruns/712331539594497428/7b21b8004d6c40e2978dd75b969a878b/
-!mlruns/712331539594497428/7b21b8004d6c40e2978dd75b969a878b/**
-!mlruns/712331539594497428/c12f552b9cb04309966e905c9415709d/
-!mlruns/712331539594497428/c12f552b9cb04309966e905c9415709d/**
-!mlruns/712331539594497428/25a11d6931d542dbb13ca7d923256783/
-!mlruns/712331539594497428/25a11d6931d542dbb13ca7d923256783/**
-
-# ── Assets ──────────────────────────────────────────────────────
-assets/v3/
-# assets/ raíz se sube completa (las 3 CM de los mejores modelos)
+#!mlruns/314868173493193477/
+#mlruns/314868173493193477/**

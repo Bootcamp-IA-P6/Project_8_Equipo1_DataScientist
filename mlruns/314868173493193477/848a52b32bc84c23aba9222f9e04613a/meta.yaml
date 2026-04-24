@@ -1,0 +1,14 @@
+artifact_uri: file:///mnt/c/Users/under/Documents/F5/3_Projects/Stroker_project/mlruns/314868173493193477/848a52b32bc84c23aba9222f9e04613a/artifacts
+end_time: 1776868814954
+entry_point_name: ''
+experiment_id: '314868173493193477'
+lifecycle_stage: active
+run_id: 848a52b32bc84c23aba9222f9e04613a
+run_name: XGB_optuna_full_smote=False_feat=False
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1776868800165
+status: 3
+tags: []
+user_id: under

@@ -1,0 +1,15 @@
+artifact_uri: file:///mnt/c/Users/under/Documents/F5/3_Projects/Stroker_project/mlruns/314868173493193477/91779b60a1da431199e2f8b4899f545c/artifacts
+end_time: 1776934802215
+entry_point_name: ''
+experiment_id: '314868173493193477'
+lifecycle_stage: active
+run_id: 91779b60a1da431199e2f8b4899f545c
+run_name: Iris_XGBoost_optuna_full_smote=False
+run_uuid: 91779b60a1da431199e2f8b4899f545c
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1776934793571
+status: 3
+tags: []
+user_id: Coder
