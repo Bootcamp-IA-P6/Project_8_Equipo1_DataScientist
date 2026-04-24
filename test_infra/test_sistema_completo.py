@@ -45,10 +45,20 @@ def test_arquitectura_completa():
             
             print("\n ¡SISTEMA INTEGRADO FUNCIONANDO!")
             print(f"Puedes ver la foto aquí: {url}")
+            
+            # --- TUS ASERCIONES PARA PYTEST ---
+            assert url is not None, "El link no debería estar vacío"
+            assert "supabase.co" in url, "Debería ser un link de Supabase"
+            
         else:
-            print("❌ No encontré el archivo 'prueba.png' en la carpeta, pero la tabla de texto funcionó.")
+            print("❌ No encontré el archivo 'prueba.png'.")
 
     except Exception as e:
         print(f"\n❌ Error: {e}")
+        assert False, f"El test falló con esta excepción: {e}" # Si hay error, que el test falle
 
-test_arquitectura_completa()
+# --- EL TRUCO PRO ---
+# Si ejecutas "python test_sistema_completo.py", entrará por aquí.
+# Si ejecutas "pytest", ignorará esto y solo testeará la función sin repetirla.
+if __name__ == "__main__":
+    test_arquitectura_completa()

@@ -7,7 +7,7 @@ on:
     branches:
       - main
       - develop
-      - feature_docker-ci-cd
+      - feature_docker-cicd
   pull_request:
     branches:
       - main
@@ -43,7 +43,7 @@ jobs:
       
       - name: Ejecutar los tests
         run: |
-          uv run pytest tests/
+          uv run pytest test/
 
   
   # Segundo paso: Si los tests pasan, construimos y subimos la imagen Docker a GitHub Container Registry
