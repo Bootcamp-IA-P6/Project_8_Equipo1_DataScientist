@@ -2,7 +2,7 @@
 .env
 __pycache__
 .DS_Store
-
+.vscode
 
 # Created by https://www.toptal.com/developers/gitignore/api/python,jupyternotebooks,dotenv
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,jupyternotebooks,dotenv
@@ -206,19 +206,6 @@ pyrightconfig.json
 mlflow.db
 
 
-# ignorar todo dentro
-assets/*
-
-# permitir carpeta v2
-!assets/v2/
-!assets/v1/
-!assets/v3/
-
-# permitir TODO lo que hay dentro de v2
-!assets/v2/**
-!assets/v1/**
-!assets/v3/**
-
 # Permitir entrar en la carpeta
 !mlruns/
 
@@ -226,6 +213,8 @@ assets/*
 mlruns/163802690665606012/**
 mlruns/671783000064998482/**
 mlruns/801261444467686969/**
+mlruns/931021681281009593
+
 
 # 👉 PERMITIR SOLO ESTE EXPERIMENTO
 #!mlruns/314868173493193477/

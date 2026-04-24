@@ -1,0 +1,90 @@
+{
+    "model_name": "XGB_optuna",
+    "threshold": 0.5517,
+    "metrics": {
+        "auc": 0.8490813093980993,
+        "pr_auc": 0.17184263660843524,
+        "recall": 0.8,
+        "precision": 0.1652892561983471,
+        "f1": 0.273972602739726
+    },
+    "features": [
+        "gender",
+        "age",
+        "hypertension",
+        "heart_disease",
+        "ever_married",
+        "work_type",
+        "Residence_type",
+        "avg_glucose_level",
+        "bmi",
+        "smoking_status"
+    ],
+    "feature_info": {
+        "gender": {
+            "type": "categorical",
+            "values": [
+                "Female",
+                "Male"
+            ]
+        },
+        "age": {
+            "type": "numeric",
+            "min": 0.08,
+            "max": 82.0
+        },
+        "hypertension": {
+            "type": "numeric",
+            "min": 0.0,
+            "max": 1.0
+        },
+        "heart_disease": {
+            "type": "numeric",
+            "min": 0.0,
+            "max": 1.0
+        },
+        "ever_married": {
+            "type": "categorical",
+            "values": [
+                "No",
+                "Yes"
+            ]
+        },
+        "work_type": {
+            "type": "categorical",
+            "values": [
+                "Govt_job",
+                "Private",
+                "Self-employed",
+                "not_applied"
+            ]
+        },
+        "Residence_type": {
+            "type": "categorical",
+            "values": [
+                "Rural",
+                "Urban"
+            ]
+        },
+        "avg_glucose_level": {
+            "type": "numeric",
+            "min": 55.12,
+            "max": 267.76
+        },
+        "bmi": {
+            "type": "numeric",
+            "min": 14.0,
+            "max": 48.9
+        },
+        "smoking_status": {
+            "type": "categorical",
+            "values": [
+                "Unknown",
+                "formerly smoked",
+                "never smoked",
+                "smokes"
+            ]
+        }
+    },
+    "scale_pos_weight": 19.1
+}
