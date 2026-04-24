@@ -1,0 +1,84 @@
+name: CI/CD Pipeline - Tests & Docker Build
+
+
+# Cada vez que se haga push a la rama 'main' o 'develop', o feature_docker-ci-cd, o se abra un pull request hacia 'main', se ejecutará esta pipeline
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - feature_docker-ci-cd
+  pull_request:
+    branches:
+      - main
+      - develop
+  
+
+# GitHub nos da permisos automáticamente para subir imágenes a su registro (ghcr.io)
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  
+  # Primero pasan los tests
+  test:
+    name: Run Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+
+      - name: Instalar uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias con uv
+        run: uv sync
+
+      
+      - name: Ejecutar los tests
+        run: |
+          uv run pytest tests/
+
+  
+  # Segundo paso: Si los tests pasan, construimos y subimos la imagen Docker a GitHub Container Registry
+  build-and-push:
+    name: Build & Push Docker Image
+    needs: test # ¡Esta línea es la magia! Exige que los tests pasen primero
+    runs-on: ubuntu-latest
+    
+    # Solo subimos la imagen si el código va hacia la rama main o develop o feature_docker-ci-cd,pero en main y develop solo si es PR con merge.
+    if: github.event_name == 'push'
+
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+
+      - name: Iniciar sesión en GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extraer metadatos para Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=sha
+            latest
+
+      - name: Construir y subir imagen Docker
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
