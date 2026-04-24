@@ -7,7 +7,7 @@ on:
     branches:
       - main
       - develop
-      - feature_docker-cicd
+      - feature_docker_cicd
   pull_request:
     branches:
       - main
