@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  streamlit-app:
+    container_name: ictus_predictor_app
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8501:8501"
+    # ¡La magia está aquí! Le pasamos las contraseñas de Supabase al contenedor
+    env_file:
+      - .env
+    
+    volumes:
+      - .:/app
