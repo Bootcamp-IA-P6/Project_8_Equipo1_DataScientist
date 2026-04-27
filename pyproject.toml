@@ -13,6 +13,7 @@ dependencies = [
     "pandas>=2.0.0,<3.0.0",
     "pillow>=12.2.0",
     "protobuf<4",
+    "pytest>=9.0.3",
     "python-dotenv>=1.2.2",
     "scikit-learn>=1.8.0",
     "seaborn>=0.13.2",
@@ -24,4 +25,11 @@ dependencies = [
     "torch>=2.10.0",
     "torchvision>=0.25.0",
     "xgboost>=3.2.0",
+]
+[tool.pytest.ini_options]
+pythonpath = [
+  "."
+]
+filterwarnings = [
+    "ignore::DeprecationWarning"
 ]
