@@ -1,0 +1,14 @@
+artifact_uri: file:///mnt/c/Users/under/Documents/F5/3_Projects/Stroker_project/mlruns/162186314945541774/15d857b0fcc348c9ac0f33611cc61a6f/artifacts
+end_time: 1777496161792
+entry_point_name: ''
+experiment_id: '162186314945541774'
+lifecycle_stage: active
+run_id: 15d857b0fcc348c9ac0f33611cc61a6f
+run_name: cnn_EfficientNetB0
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1777496159509
+status: 3
+tags: []
+user_id: under

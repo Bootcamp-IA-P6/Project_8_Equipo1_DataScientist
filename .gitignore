@@ -43,7 +43,7 @@ __pycache__/
 reports/
 pruebas.py
 data/cnn/**
-cnn/
+
 
 # Distribution / packaging
 .Python

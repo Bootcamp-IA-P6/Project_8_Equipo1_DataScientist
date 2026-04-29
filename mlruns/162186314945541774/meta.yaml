@@ -1,0 +1,8 @@
+artifact_location: file:///mnt/c/Users/under/Documents/F5/3_Projects/Stroker_project/mlruns/162186314945541774
+creation_time: 1777285268600
+experiment_id: '162186314945541774'
+last_update_time: 1777285268600
+lifecycle_stage: active
+name: stroke_cnn
+trace_location: null
+workspace: default
