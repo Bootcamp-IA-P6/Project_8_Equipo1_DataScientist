@@ -14,7 +14,7 @@ def test_arquitectura_completa():
         paciente = {
             "patient_id": p_id,
             "gender": "Male",
-            "age": 60.0,
+            "age": 15.0,
             "hypertension": 1,
             "heart_disease": 0,
             "ever_married": "Yes",
@@ -24,11 +24,25 @@ def test_arquitectura_completa():
             "bmi": 28.4,
             "smoking_status": "formerly smoked",
             "prediction": 1,
-            "probability": 0.85
+            "probability": 0.85,
+            "age_group": "children"
         }
         
         print(f"--- Registrando paciente {p_id} con historial completo ---")
-        supabase.table("stroke_predictions").insert(paciente).execute()
+        respuesta_sql = supabase.table("stroke_predictions").insert(paciente).execute()
+        assert len(respuesta_sql.data) > 0, "No se guardó el paciente en la tabla SQL"
+        
+        # 2. REGISTRAR CONSTANTES VITALES (Nueva tabla)
+        print(f"--- Registrando constantes vitales para {p_id} ---")
+        vitals = {
+            "patient_id": p_id,
+            "patient_name": "Paciente de Prueba_Niño",
+            "spo2": 98,
+            "bpm": 75
+        }
+        respuesta_vitals = supabase.table("patient_vitals").insert(vitals).execute()
+        assert len(respuesta_vitals.data) > 0, "No se guardaron las constantes vitales"
+        print("✅ Tabla patient_vitals vinculada correctamente.")
 
         # 2. SUBIR IMAGEN AL BUCKET (Fase 2)
         ruta_imagen = "./assets/v2/prueba.png" 
