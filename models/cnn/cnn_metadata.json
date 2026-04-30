@@ -1,0 +1,20 @@
+{
+    "model_name": "cnn_EfficientNetB0",
+    "architecture": "EfficientNetB0",
+    "img_size": [
+        224,
+        224
+    ],
+    "threshold": 0.5,
+    "input_range": "[0,255]",
+    "classes": {
+        "0": "normal",
+        "1": "stroke"
+    },
+    "metrics": {
+        "auc": 0.9618,
+        "recall": 0.9021,
+        "precision": 0.8269,
+        "f1": 0.8629
+    }
+}
