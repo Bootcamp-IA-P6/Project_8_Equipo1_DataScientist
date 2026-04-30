@@ -41,6 +41,9 @@ __pycache__/
 02_modeling_final.ipynb
 03_optuna_v1.ipynb
 reports/
+pruebas.py
+data/cnn/**
+
 
 # Distribution / packaging
 .Python
