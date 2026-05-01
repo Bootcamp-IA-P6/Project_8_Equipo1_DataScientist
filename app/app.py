@@ -8,7 +8,11 @@ from dotenv import load_dotenv
 from supabase import create_client, Client
 from datetime import datetime
 import time
+import io
 import base64
+import tensorflow as tf
+from PIL import Image
+
 
 # ─────────────────────────────────────────────
 # 1. CONFIGURACIÓN
@@ -17,6 +21,7 @@ load_dotenv()
 
 BASE_DIR    = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RUTA_MODELO = os.path.join(BASE_DIR, "models", "XGB_optuna_final.joblib")
+RUTA_CNN = os.path.join(BASE_DIR, "models","cnn", "cnn_efficientnetb0_final.keras")
 RUTA_LOGO   = os.path.join(BASE_DIR, "assets", "aria_logo.png")
 
 @st.cache_resource
@@ -32,6 +37,32 @@ def cargar_modelo_xgb():
             st.error(f"Error al cargar el modelo: {e}")
     return None
 
+@st.cache_resource
+def cargar_modelo_cnn():
+    if not os.path.exists(RUTA_CNN):
+        st.warning("Modelo CNN no encontrado")
+        return None
+    return tf.keras.models.load_model(RUTA_CNN, compile=False)
+
+@st.cache_resource
+def cargar_metadata_xgb():
+    import json
+    ruta = os.path.join(BASE_DIR, "models", "metadata.json")
+    if os.path.exists(ruta):
+        with open(ruta) as f:
+            return json.load(f)
+    return {"threshold": 0.5517, "scale_pos_weight": 19.1}
+
+@st.cache_resource
+def cargar_metadata_cnn():
+    import json
+    ruta = os.path.join(BASE_DIR, "models", "cnn", "cnn_metadata.json")
+    if os.path.exists(ruta):
+        with open(ruta) as f:
+            return json.load(f)
+    return {"threshold": 0.50}
+
+@st.cache_resource
 def logo_base64():
     if os.path.exists(RUTA_LOGO):
         with open(RUTA_LOGO, "rb") as f:
@@ -40,6 +71,19 @@ def logo_base64():
 
 supabase   = iniciar_conexion()
 modelo_xgb = cargar_modelo_xgb()
+modelo_cnn = cargar_modelo_cnn()
+
+META_XGB = cargar_metadata_xgb()
+META_CNN = cargar_metadata_cnn()
+
+XGB_THRESHOLD      = META_XGB.get("threshold", 0.5517)
+XGB_SCALE_POS_W    = META_XGB.get("scale_pos_weight", 19.1)
+CNN_THRESHOLD      = META_CNN.get("threshold", 0.50)
+
+# Umbrales de riesgo sobre escala normalizada [0-100]
+UMBRAL_CRITICO = 70.0
+UMBRAL_ALTO    = 50.0   # = threshold normalizado de cualquier modelo
+UMBRAL_MEDIO   = 35.0
 
 # ─────────────────────────────────────────────
 # 2. MAPEOS ES → EN
@@ -95,14 +139,14 @@ st.markdown("""
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap');
 
 html, body, [class*="css"] { font-family: 'DM Sans', sans-serif; }
-            
+
 .main .block-container {
     padding-top: 0 !important;
     padding-left: 2rem !important;
     padding-right: 2rem !important;
     max-width: 1280px;
 }
-            
+
 section[data-testid="stSidebar"] { display: none; }
 #MainMenu, footer, header { visibility: hidden; }
 
@@ -255,13 +299,13 @@ div.emergency-btn [data-testid="stButton"] button {
     background-color: #E24B4A !important;
     border: 2px solid #E24B4A !important;
     border-radius: 12px !important;
-    
+
     /* Dimensiones y Centrado */
     width: auto !important;
     min-width: 350px !important;
     display: block !important;
     margin: 1.5rem auto !important;
-    
+
     /* Animación */
     animation: pulse-red 2s infinite !important;
     transition: all 0.3s ease !important;
@@ -286,8 +330,8 @@ div.emergency-btn [data-testid="stButton"] button:hover {
     70% { box-shadow: 0 0 0 15px rgba(226, 75, 74, 0); }
     100% { box-shadow: 0 0 0 0 rgba(226, 75, 74, 0); }
 }
-            
-            
+
+
 /* ── Streamlit overrides ── */
 div[data-testid="stHorizontalBlock"] .stButton > button {{
     border-radius: 8px !important;
@@ -306,7 +350,7 @@ label {{
     font-weight: 500 !important;
     color: #3a5272 !important;
 }}
-            
+
 header { display: none !important; }
 
 div[data-testid="stAppViewContainer"] > .main {
@@ -346,11 +390,17 @@ def cargar_paciente_existente(p_id):
         rp = supabase.table("stroke_predictions").select("*").eq("patient_id", p_id).single().execute()
         rv = supabase.table("patient_vitals").select("*").eq("patient_id", p_id).single().execute()
         if rp.data and rv.data:
+            cnn_prob = rp.data.get("cnn_probability") or 0
             st.session_state.temp_data.update({
-                "patient_id": p_id, "patient_name": rv.data["patient_name"],
-                "spo2": rv.data["spo2"], "bpm": rv.data["bpm"],
-                "xgb_prob": rp.data["probability"], "xgb_pred": rp.data["prediction"],
-                "finalizado": True,
+                "patient_id":   p_id,
+                "patient_name": rv.data["patient_name"],
+                "spo2":         rv.data["spo2"],
+                "bpm":          rv.data["bpm"],
+                "xgb_prob":     rp.data["probability"],
+                "xgb_pred":     rp.data["prediction"],
+                "cnn_prob":     cnn_prob,
+                "cnn_done":     cnn_prob > 0,   # True si ya se analizó CT
+                "finalizado":   True,
             })
             return True
     except:
@@ -378,6 +428,34 @@ def card_open(step, title):
 def card_close():
     pass
 
+
+def preprocess_cnn(image: Image.Image):
+    image = image.convert("RGB").resize((224, 224))
+    x = np.array(image).astype(np.float32) / 255.0
+    return np.expand_dims(x, axis=0)
+
+
+def normalizar_prob(prob_pct, threshold):
+    """
+    Normaliza la probabilidad de un modelo respecto a su threshold.
+    Resultado en [0, 100] donde 50 = exactamente en el threshold clínico.
+    """
+    p = prob_pct / 100.0
+    t = threshold
+    if p >= t:
+        return round(50.0 + (p - t) / (1.0 - t) * 50.0, 2)
+    else:
+        return round((p / t) * 50.0, 2)
+
+
+def prob_real_xgb(prob_pct, scale_pos_weight):
+    """
+    Estima la probabilidad real de ictus corrigiendo el sesgo
+    introducido por scale_pos_weight en XGBoost.
+    """
+    p = prob_pct / 100.0
+    p_real = p / (p + (1.0 - p) * scale_pos_weight)
+    return round(p_real * 100.0, 1)
 # ─────────────────────────────────────────────
 # 7. NAVBAR
 # ─────────────────────────────────────────────
@@ -455,9 +533,11 @@ def show_dashboard():
             for item in res.data:
                 v    = item["patient_vitals"][0] if item["patient_vitals"] else {"patient_name": "N/A"}
                 prob = item["probability"]
-                if prob > 60:
+                if prob >= UMBRAL_CRITICO:
+                    badge = f'<span style="background:#7B0000;color:#FFD0D0;border:1px solid #E24B4A;border-radius:20px;padding:3px 12px;font-size:12px;font-weight:600;">{prob}% · Crítico</span>'
+                elif prob >= UMBRAL_ALTO:
                     badge = f'<span style="background:#FCEBEB;color:#791F1F;border:1px solid #F09595;border-radius:20px;padding:3px 12px;font-size:12px;font-weight:600;">{prob}% · Alto</span>'
-                elif prob > 30:
+                elif prob >= UMBRAL_MEDIO:
                     badge = f'<span style="background:#FAEEDA;color:#633806;border:1px solid #FAC775;border-radius:20px;padding:3px 12px;font-size:12px;font-weight:600;">{prob}% · Moderado</span>'
                 else:
                     badge = f'<span style="background:#EAF3DE;color:#27500A;border:1px solid #C0DD97;border-radius:20px;padding:3px 12px;font-size:12px;font-weight:600;">{prob}% · Bajo</span>'
@@ -565,28 +645,97 @@ def show_clinical_data():
             st.error("El modelo no está disponible. Verifique la ruta del archivo.")
     card_close()
 
-
 def show_ct_scan():
     if not st.session_state.temp_data["finalizado"]:
         st.warning("Realice primero el análisis clínico (paso 2)."); return
 
     card_open("3", "CT Scan · Análisis por imagen (CNN)")
-    archivo = st.file_uploader("Cargar imagen de TAC (.png / .jpg)", type=["png","jpg","jpeg"])
-    if archivo:
-        col1, col2 = st.columns(2)
-        col1.image(archivo, use_container_width=True, caption="Imagen cargada")
-        with col2:
-            with st.spinner("Procesando inferencia CNN..."):
-                time.sleep(1)
-            cnn_prob = 84.2
-            st.session_state.temp_data.update({"cnn_prob": cnn_prob, "cnn_done": True})
-            st.markdown(f"""
-            <div style="background:#F4F7FB;border:1px solid #DDEAF7;border-radius:12px;padding:1rem 1.25rem;text-align:center;margin-top:1rem;">
-                <div style="font-size:10.5px;color:#5F7A99;text-transform:uppercase;letter-spacing:0.1em;font-weight:500;margin-bottom:4px;">Detección CNN</div>
-                <div style="font-size:28px;font-weight:600;line-height:1.1;color:#A32D2D;">{cnn_prob}%</div>
-                <div style="font-size:11px;color:#5F7A99;margin-top:3px;">Probabilidad de lesión isquémica</div>
-            </div>""", unsafe_allow_html=True)
-            st.success("Imagen procesada correctamente.")
+   
+    # ── Guard: si ya se procesó en esta sesión, mostrar resultado y salir ──
+    if st.session_state.temp_data["cnn_done"]:
+        st.success(f"✔ Imagen ya procesada. Probabilidad CNN: **{st.session_state.temp_data['cnn_prob']}%**")
+        if st.button("Ir al informe →", type="primary"):
+            st.session_state.page = "Combined"
+            st.rerun()
+        card_close()
+        return
+
+    archivo = st.file_uploader(
+        "Cargar imagen de TAC (.png / .jpg)",
+        type=["png", "jpg", "jpeg"],
+        key="ct_uploader",          # key estable → evita re-triggers
+    )
+
+    if archivo is None:
+        card_close()
+        return
+
+    # Leer bytes UNA sola vez
+    img_bytes = archivo.getvalue()
+    image = Image.open(io.BytesIO(img_bytes))
+
+    col1, col2 = st.columns(2)
+    col1.image(image, use_container_width=True)
+
+    with col2:
+        patient_id = st.session_state.temp_data.get("patient_id")
+        if not patient_id:
+            st.error("No hay patient_id — complete el paso 2 primero.")
+            card_close()
+            return
+
+        # ── Botón explícito para evitar inferencia accidental ──
+        if st.button("Analizar CT Scan →", type="primary"):
+
+            with st.spinner("Subiendo imagen y ejecutando modelo CNN…"):
+                try:
+                    # 1. Upload al bucket brain_scans
+                    path = f"ct/{patient_id}/{uuid.uuid4().hex}.png"
+                    supabase.storage.from_("tomografias").upload(
+                        path=path,
+                        file=img_bytes,
+                        file_options={"content-type": "image/png"},
+                    )
+                    image_url = supabase.storage.from_("tomografias").get_public_url(path)
+
+                    # 2. Insertar registro en tabla brain_scans
+                    #    Columnas: id (auto), patient_id, image_url, created_at (auto)
+                    supabase.table("brain_scans").insert({
+                        "patient_id": patient_id,
+                        "image_url":  image_url,
+                    }).execute()
+
+                    # 3. Inferencia CNN
+                    if modelo_cnn is None:
+                        st.error("Modelo CNN no cargado. Verifique la ruta del archivo.")
+                        card_close()
+                        return
+
+                    x        = preprocess_cnn(image)
+                    y        = modelo_cnn.predict(x)
+                    # Compatible con salida sigmoid (1 neurona) o softmax (2 neuronas)
+                    prob_raw = float(y[0][0] if y.shape[-1] == 1 else y[0][1])
+                    cnn_prob = round(prob_raw * 100, 2)
+
+                    # 4. Actualizar stroke_predictions con la probabilidad CNN
+                    #    Se añade cnn_probability para poder recuperarla desde el dashboard
+                    supabase.table("stroke_predictions").update({
+                        "cnn_probability": cnn_prob,
+                    }).eq("patient_id", patient_id).execute()
+
+                    # 5. Persistir en session_state (una sola vez)
+                    st.session_state.temp_data.update({
+                        "cnn_prob": cnn_prob,
+                        "cnn_done": True,
+                    })
+
+                    st.success(f"Imagen guardada correctamente.")
+                    st.metric("Probabilidad CNN", f"{cnn_prob}%")
+                    st.button("Ver informe completo →", on_click=lambda: st.session_state.update({"page": "Combined"}))
+
+                except Exception as e:
+                    st.error(f"Error durante el procesamiento: {e}")
+
     card_close()
 
 
@@ -603,73 +752,206 @@ def show_combined_results():
         Informe de riesgo · {data['patient_name']}
       </div>
       <div style="font-size:11.5px;color:#5F7A99;margin-top:2px">
-        Generado por ARIA · Análisis de Riesgo con Inteligencia Artificial
+        Generado por ARIA · Análisis de Riesgo de Ictus con Inteligencia Artificial
       </div>
     </div>
     """, unsafe_allow_html=True)
 
-    # Cálculo riesgo final
-    riesgo_final = data["xgb_prob"]
-    if data["cnn_done"]:
-        riesgo_final = round(data["xgb_prob"] * 0.4 + data["cnn_prob"] * 0.6, 1)
-    color_rf = "#A32D2D" if riesgo_final > 70 else "#854F0B" if riesgo_final > 30 else "#27500A"
+    # ── Cálculo del riesgo normalizado y final ────────────────────────────
+    xgb_norm = normalizar_prob(data["xgb_prob"], XGB_THRESHOLD)
 
-    # Métricas
+    if data["cnn_done"]:
+        cnn_norm     = normalizar_prob(data["cnn_prob"], CNN_THRESHOLD)
+        riesgo_final = round(xgb_norm * 0.40 + cnn_norm * 0.60, 1)
+        formula_lbl  = f"XGB×0.40 + CNN×0.60 (pesos por AUC)"
+    else:
+        cnn_norm     = None
+        riesgo_final = round(xgb_norm, 1)
+        formula_lbl  = "Solo evaluación clínica (sin CT)"
+
+    # Probabilidad real XGB corregida por scale_pos_weight
+    p_real_xgb = prob_real_xgb(data["xgb_prob"], XGB_SCALE_POS_W)
+
+    # Color del riesgo final
+    if riesgo_final >= UMBRAL_CRITICO:
+        color_rf = "#7B0000"
+        label_rf = "Crítico"
+    elif riesgo_final >= UMBRAL_ALTO:
+        color_rf = "#A32D2D"
+        label_rf = "Alto"
+    elif riesgo_final >= UMBRAL_MEDIO:
+        color_rf = "#854F0B"
+        label_rf = "Moderado"
+    else:
+        color_rf = "#27500A"
+        label_rf = "Bajo"
+
+    # ── Métricas — fila 1: modelos individuales ───────────────────────────
     c1, c2, c3 = st.columns(3)
+
     with c1:
         st.markdown(f"""
-        <div style="background:#F4F7FB;border:1px solid #DDEAF7;border-radius:12px;padding:1rem 1.25rem;text-align:center;">
-          <div style="font-size:10.5px;color:#5F7A99;text-transform:uppercase;letter-spacing:0.1em;font-weight:500;margin-bottom:4px;">Riesgo clínico · XGBoost</div>
-          <div style="font-size:28px;font-weight:600;color:#0C447C;line-height:1.1;">{data['xgb_prob']}%</div>
-          <div style="font-size:11px;color:#5F7A99;margin-top:3px;">Basado en historia clínica</div>
+        <div style="background:#F4F7FB;border:1px solid #DDEAF7;border-radius:12px;
+                    padding:1rem 1.25rem;text-align:center;">
+          <div style="font-size:10.5px;color:#5F7A99;text-transform:uppercase;
+                      letter-spacing:0.1em;font-weight:500;margin-bottom:4px;">
+            Riesgo clínico · XGBoost
+          </div>
+          <div style="font-size:28px;font-weight:600;color:#0C447C;line-height:1.1;">
+            {data['xgb_prob']}%
+          </div>
+          <div style="font-size:11px;color:#5F7A99;margin-top:3px;">
+            Normalizado: {xgb_norm}% · P.real ~{p_real_xgb}%
+          </div>
         </div>""", unsafe_allow_html=True)
+
     with c2:
         if data["cnn_done"]:
             st.markdown(f"""
-            <div style="background:#F4F7FB;border:1px solid #DDEAF7;border-radius:12px;padding:1rem 1.25rem;text-align:center;">
-              <div style="font-size:10.5px;color:#5F7A99;text-transform:uppercase;letter-spacing:0.1em;font-weight:500;margin-bottom:4px;">Riesgo por imagen · CNN</div>
-              <div style="font-size:28px;font-weight:600;color:#0C447C;line-height:1.1;">{data['cnn_prob']}%</div>
-              <div style="font-size:11px;color:#5F7A99;margin-top:3px;">Basado en CT Scan</div>
+            <div style="background:#F4F7FB;border:1px solid #DDEAF7;border-radius:12px;
+                        padding:1rem 1.25rem;text-align:center;">
+              <div style="font-size:10.5px;color:#5F7A99;text-transform:uppercase;
+                          letter-spacing:0.1em;font-weight:500;margin-bottom:4px;">
+                Riesgo por imagen · CNN
+              </div>
+              <div style="font-size:28px;font-weight:600;color:#0C447C;line-height:1.1;">
+                {data['cnn_prob']}%
+              </div>
+              <div style="font-size:11px;color:#5F7A99;margin-top:3px;">
+                Normalizado: {cnn_norm}%
+              </div>
             </div>""", unsafe_allow_html=True)
         else:
             st.markdown("""
-            <div style="background:#F4F7FB;border:1px solid #DDEAF7;border-radius:12px;padding:1rem 1.25rem;text-align:center;opacity:.45;">
-              <div style="font-size:10.5px;color:#5F7A99;text-transform:uppercase;letter-spacing:0.1em;font-weight:500;margin-bottom:4px;">Riesgo por imagen · CNN</div>
-              <div style="font-size:15px;font-weight:600;color:#0C447C;padding-top:6px;">No realizado</div>
+            <div style="background:#F4F7FB;border:1px solid #DDEAF7;border-radius:12px;
+                        padding:1rem 1.25rem;text-align:center;opacity:.45;">
+              <div style="font-size:10.5px;color:#5F7A99;text-transform:uppercase;
+                          letter-spacing:0.1em;font-weight:500;margin-bottom:4px;">
+                Riesgo por imagen · CNN
+              </div>
+              <div style="font-size:15px;font-weight:600;color:#0C447C;padding-top:6px;">
+                No realizado
+              </div>
               <div style="font-size:11px;color:#5F7A99;margin-top:3px;">CT Scan pendiente</div>
             </div>""", unsafe_allow_html=True)
+
     with c3:
         st.markdown(f"""
-        <div style="background:#F4F7FB;border:1px solid #DDEAF7;border-radius:12px;padding:1rem 1.25rem;text-align:center;border:2px solid {color_rf};">
-          <div style="font-size:10.5px;color:#5F7A99;text-transform:uppercase;letter-spacing:0.1em;font-weight:500;margin-bottom:4px;">Riesgo combinado final</div>
-          <div style="font-size:28px;font-weight:600;line-height:1.1;color:{color_rf};">{riesgo_final}%</div>
-          <div style="font-size:11px;color:#5F7A99;margin-top:3px;">{'XGB × 0.4 + CNN × 0.6' if data['cnn_done'] else 'Solo evaluación clínica'}</div>
+        <div style="background:#F4F7FB;border:2px solid {color_rf};border-radius:12px;
+                    padding:1rem 1.25rem;text-align:center;">
+          <div style="font-size:10.5px;color:#5F7A99;text-transform:uppercase;
+                      letter-spacing:0.1em;font-weight:500;margin-bottom:4px;">
+            Riesgo combinado final
+          </div>
+          <div style="font-size:28px;font-weight:600;line-height:1.1;color:{color_rf};">
+            {riesgo_final}%
+            <span style="font-size:14px;font-weight:600;"> · {label_rf}</span>
+          </div>
+          <div style="font-size:11px;color:#5F7A99;margin-top:3px;">{formula_lbl}</div>
         </div>""", unsafe_allow_html=True)
 
     st.markdown('<div style="height:1rem"></div>', unsafe_allow_html=True)
 
-    # Alerta
-    if riesgo_final > 70:
+    # ── Barra visual de riesgo ────────────────────────────────────────────
+    st.markdown(f"""
+    <div style="background:#F4F7FB;border:1px solid #DDEAF7;border-radius:12px;
+                padding:1rem 1.25rem;margin-bottom:1rem;">
+      <div style="font-size:11px;color:#5F7A99;font-weight:500;
+                  margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em;">
+        Escala de riesgo normalizada
+      </div>
+      <div style="position:relative;height:12px;border-radius:6px;
+                  background:linear-gradient(to right,#C0DD97,#FAC775,#F09595,#E24B4A,#7B0000);">
+        <div style="position:absolute;left:calc({min(riesgo_final, 99)}% - 7px);top:-4px;
+                    width:20px;height:20px;background:white;border:3px solid {color_rf};
+                    border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,0.2);"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;
+                  font-size:10px;color:#5F7A99;margin-top:6px;">
+        <span>0% · Bajo</span>
+        <span>35% · Vigilancia</span>
+        <span>50% · Umbral</span>
+        <span>70% · Crítico</span>
+        <span>100%</span>
+      </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # ── Alertas clínicas ──────────────────────────────────────────────────
+    if riesgo_final >= UMBRAL_CRITICO:
         st.markdown(f"""
-        <div style="background:#FCEBEB;border:1.5px solid #F09595;border-left:5px solid #E24B4A;
-                    border-radius:12px;padding:1rem 1.25rem;margin:1rem 0;">
-          <div style="font-size:14px;font-weight:600;color:#791F1F;margin-bottom:4px;">
-            Alerta crítica — Riesgo elevado de ictus
-          </div>
-          <div style="font-size:12px;color:#A32D2D;">
-            Riesgo combinado: {riesgo_final}%. Se recomienda notificación inmediata al servicio de neurología.
+        <div style="background:#3D0000;border:1.5px solid #E24B4A;border-left:5px solid #FF0000;
+                    border-radius:12px;padding:1rem 1.25rem;margin:0.5rem 0;">
+          <div style="font-size:14px;font-weight:600;color:#FFD0D0;margin-bottom:4px;">
+            🚨 RIESGO CRÍTICO — Activar protocolo de ictus
+          </div><br>
+          <div style="font-size:14px;color:#FFAAAA;">
+            <p> Riesgo normalizado: {riesgo_final}% (umbral crítico ≥{UMBRAL_CRITICO}%).</p>
+            <p> Probabilidad real estimada por datos clínicos: ~{p_real_xgb}%. </p>
+            <p> Notificación inmediata a neurología y activación de código ictus. </p>
           </div>
         </div>""", unsafe_allow_html=True)
         st.markdown('<div class="div.emergency-btn">', unsafe_allow_html=True)
-        if st.button(" 🚨 Notificar urgencia a neurología", use_container_width=False):
-            st.toast("Notificación enviada al servicio de neurología.")
+        if st.button("🚨 Notificar urgencia a neurología", use_container_width=False):
+            st.toast("🚨 Notificación enviada al servicio de neurología.", icon="🚨")
         st.markdown('</div>', unsafe_allow_html=True)
-    elif riesgo_final > 30:
-        st.warning(f"Riesgo moderado: {riesgo_final}%. Se recomienda seguimiento clínico.")
+
+    elif riesgo_final >= UMBRAL_ALTO:
+        st.markdown(f"""
+        <div style="background:#FCEBEB;border:1.5px solid #F09595;border-left:5px solid #E24B4A;
+                    border-radius:12px;padding:1rem 1.25rem;margin:0.5rem 0;">
+          <div style="font-size:14px;font-weight:600;color:#791F1F;margin-bottom:4px;">
+            ⚠️ Alerta — Riesgo elevado de ictus
+          </div><br>
+          <div style="font-size:12px;color:#A32D2D;">
+            <p>Riesgo normalizado: {riesgo_final}%. Supera el umbral clínico del modelo ({UMBRAL_ALTO}%).</p>
+            <p>Evaluación neurológica prioritaria recomendada.</p>
+          </div>
+        </div>""", unsafe_allow_html=True)
+
+    elif riesgo_final >= UMBRAL_MEDIO:
+        st.markdown(f"""
+        <div style="background:#FAEEDA;border:1.5px solid #FAC775;border-left:5px solid #F0A500;
+                    border-radius:12px;padding:1rem 1.25rem;margin:0.5rem 0;">
+          <div style="font-size:14px;font-weight:600;color:#633806;margin-bottom:4px;">
+            ⚠️ Riesgo moderado — Zona de vigilancia
+          </div><br>
+          <div style="font-size:12px;color:#854F0B;">
+            <p>Riesgo normalizado: {riesgo_final}%. Por encima del umbral de vigilancia ({UMBRAL_MEDIO}%).</p>
+            <p>Se recomienda seguimiento clínico y reevaluación.</p>
+          </div>
+        </div>""", unsafe_allow_html=True)
+
     else:
-        st.success(f"Riesgo bajo: {riesgo_final}%. Control rutinario.")
+        st.markdown(f"""
+        <div style="background:#EAF3DE;border:1.5px solid #C0DD97;border-left:5px solid #6AAF20;
+                    border-radius:12px;padding:1rem 1.25rem;margin:0.5rem 0;">
+          <div style="font-size:14px;font-weight:600;color:#27500A;margin-bottom:4px;">
+            ✔ Riesgo bajo — Control rutinario
+          </div><br>
+          <div style="font-size:12px;color:#3A6B10;">
+            <p>Riesgo normalizado: {riesgo_final}%. Por debajo del umbral de vigilancia.</p>
+            <p>No se requieren acciones inmediatas.</p>
+          </div>
+        </div>""", unsafe_allow_html=True)
+
+    # ── Nota estadística ──────────────────────────────────────────────────
+    st.markdown(f"""
+    <div style="background:#F4F7FB;border:1px solid #DDEAF7;border-radius:10px;
+                padding:0.75rem 1rem;margin-top:0.75rem;">
+      <div style="font-size:12.5px;color:#5F7A99;line-height:1.6;">
+        <strong style="color:#3a5272;">ℹ️ Nota estadística:</strong>
+        El modelo XGBoost tiene una precisión del 16.5% (1 de cada 6 alertas positivas corresponde
+        a un caso real), optimizado para maximizar la detección (recall=80%).
+        {'La CNN presenta alta precisión (82.7%) sobre imagen CT.' if data['cnn_done'] else 'La incorporación del CT Scan (CNN, precisión 82.7%) mejoraría la fiabilidad del informe.'}
+        Los resultados son orientativos y deben combinarse con el juicio clínico del especialista.
+      </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     st.markdown('<div style="height:0.5rem"></div>', unsafe_allow_html=True)
+
+    # ── Explicabilidad ────────────────────────────────────────────────────
     with st.expander("Ver explicabilidad del modelo"):
         st.bar_chart(pd.DataFrame(
             {"Contribución al riesgo": [0.5, 0.3, 0.2, 0.15, 0.1]},
