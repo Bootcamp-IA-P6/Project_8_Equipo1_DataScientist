@@ -1,10 +1,10 @@
 # 🧠 · ARIA · Stroke Prediction AI System
 
-<p align="center">
-  <img src="assets/logo.png" alt="Project Logo" width="100"/>
-</p>
-
 ![Python](https://img.shields.io/badge/Python-3.10-blue) ![MLflow](https://img.shields.io/badge/MLflow-Tracking-orange) ![Docker](https://img.shields.io/badge/Docker-Containerized-blue) ![Streamlit](https://img.shields.io/badge/Streamlit-Dashboard-red) ![Status](https://img.shields.io/badge/Status-Deployment%20Ready-green)
+
+<p align="center">
+  <img src="assets/logo.png" alt="Project Logo" width="200"/>
+</p>
 
 ---
 
@@ -321,4 +321,6 @@ Using **MLflow**, all experiments tracked with:
 
 ## ⭐ If you like this project...
 
-Give it a star ⭐ and feel free to contribute!
+<p align="center">
+  Give it a star ⭐ and feel free to contribute!
+</p>
