@@ -1,4 +1,8 @@
-# 🧠 Stroke Prediction AI System (ML + DL Hybrid)
+# 🧠 · ARIA · Stroke Prediction AI System
+
+<p align="center">
+  <img src="assets/logo.png" alt="Project Logo" width="100"/>
+</p>
 
 ![Python](https://img.shields.io/badge/Python-3.10-blue) ![MLflow](https://img.shields.io/badge/MLflow-Tracking-orange) ![Docker](https://img.shields.io/badge/Docker-Containerized-blue) ![Streamlit](https://img.shields.io/badge/Streamlit-Dashboard-red) ![Status](https://img.shields.io/badge/Status-Deployment%20Ready-green)
 
@@ -198,13 +202,14 @@ pytest --cov=src --cov-report=html
 
 ## 🌐 Deployment
 
-https://project-8-equipo1-datascientist.onrender.com/
+You can try out the app: [Render](https://project-8-equipo1-datascientist.onrender.com/)
+
 
 ---
 
 ## 🎥 Demo (Clinical Dashboard)
 
-![demo](assets/demo.gif)
+![demo](assets/Demo.gif)
 
 Interactive interface for:
 
@@ -248,17 +253,25 @@ Stroker_project/
 git clone https://github.com/your-username/stroke-prediction-ai.git
 cd stroke-prediction-ai
 
-# Install dependencies
-pip install -r requirements.txt
+## Opcion 1 ##
+# Create the environment
+conda env create --environment-spec environment.yml -f environment.yml
+
+#Activate
+conda activate stroke-prediction
+
+## Opcion 2 ##
+# Sync 
+uv sync
+
+## ## ## ##
 
 # Run pipeline
 python main.py
 
 # Run API
-python app/app.py
+streamlit run app/app.py
 
-# Run tests
-pytest
 ```
 
 ---
@@ -288,11 +301,21 @@ Using **MLflow**, all experiments tracked with:
 
 **AI & Data Science Project** focused on real-world, production-ready machine learning systems.
 
-| Name         | Role          |
-| ------------ | ------------- |
-| **Jonathan** | Scrum Master  |
-| **Iris**     | Product Owner |
-| **Gema**     | Developer     |
+| **Name**          | **Rol** |
+|---                |---      |
+| Iris Amorim       | Data Scientist & Product Owner |
+| Jonathan Basales  | Data Scientist & Scrum Master |
+| Gema Yebenes      | Data Scientist |
+
+---
+
+
+## 🔗 Project Resources
+
+| Resource | Link |
+|----------|------|
+| 📊 Slides | [Gamma Presentation](https://gamma.app/docs/Prediccion-de-Ictus-con-Machine-Learning-sh74j4v1nh151mz?mode=doc) |
+| 🗒️ technical report | [Project Report](https://www.notion.so/Estratificaci-n-de-Riesgo-de-Ictus-mediante-Machine-Learning-356abdea458e80dbbdace03dde9b0d6c?source=copy_link) |
 
 ---
 
