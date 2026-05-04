@@ -1,0 +1,39 @@
+name: stroke-prediction
+channels:
+  - conda-forge
+  - defaults
+
+dependencies:
+  - python=3.10
+
+  # Core
+  - numpy
+  - pandas
+
+  # Visualización
+  - matplotlib
+  - seaborn
+
+  # Machine Learning
+  - scikit-learn
+  - imbalanced-learn
+  - joblib
+
+  # Utils
+  - pillow
+
+  - pip
+
+  - pip:
+      # Deep Learning
+      - tensorflow
+
+      # ML adicional
+      - xgboost
+      - optuna
+
+      # Tracking
+      - mlflow
+
+      # Computer vision
+      - opencv-python
