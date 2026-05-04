@@ -46,6 +46,7 @@ H --> I
 I --> J[Final Stroke Risk]
 ```
 
+
 ### 💡 Key Idea
 
 This system follows a **sequential hybrid approach**:
@@ -99,8 +100,9 @@ Final Risk = (XGBoost × 0.40) + (CNN × 0.60)
 
 Weights are based on **model performance (AUC)**:
 
-* CNN has higher weight → better precision
-* XGBoost ensures high recall
+- XGBoost → early detection (high recall)  
+- CNN → image-based validation (high precision)  
+- CNN has higher weight due to stronger diagnostic reliability  
 
 > This balances **sensitivity and specificity**, critical in clinical settings.
 
@@ -126,11 +128,15 @@ The system mimics a real-world diagnostic workflow:
   <img src="assets/v3/cm_XGBoost_optuna_full_smote=False.png" width="400"/>
 </p>
 
+This matrix evaluates model performance with a strong focus on minimizing **false negatives**, which are critical in stroke prediction.
+
 ### 🔥 CNN Interpretability (Grad-CAM)
 
 <p align="center">
   <img src="assets/cnn/gradcam_grad-cam_—_stroke_cases.png" width="400"/>
 </p>
+
+Grad-CAM visualizes which regions of the MRI influenced the CNN decision, improving interpretability and trust in medical predictions.
 
 ---
 
@@ -170,6 +176,15 @@ F --> G
 
 ---
 
+The system is structured in 4 layers:
+
+* Data Layer → raw datasets
+* Training Layer → ML + DL pipelines
+* Model Layer → trained models
+* Application Layer → clinical dashboard
+
+👉 This modular design ensures scalability and separation of concerns
+
 ## 📁 Project Structure
 
 ```
@@ -194,6 +209,19 @@ Stroker_project/
 * **MLOps:** MLflow, Docker, GitHub Actions
 * **Data:** Pandas, NumPy
 * **Visualization:** Matplotlib, Seaborn
+
+---
+
+## 🏥 Clinical Perspective
+
+The system replicates a real hospital workflow:
+
+1. Initial screening using clinical data  
+2. MRI request only for high-risk cases  
+3. Image-based confirmation  
+4. Final decision support  
+
+> Designed as a **clinical decision support system**, not a replacement for doctors
 
 ---
 
