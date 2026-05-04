@@ -1,0 +1,11 @@
+channels:
+- conda-forge
+dependencies:
+- python=3.10.20
+- pip<=26.0.1
+- pip:
+  - scikit-learn==1.7.2
+  - xgboost
+  - imbalanced-learn
+  - mlflow
+name: mlflow-env

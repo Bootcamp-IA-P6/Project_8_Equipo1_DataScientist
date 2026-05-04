@@ -1,0 +1,14 @@
+artifact_uri: file:///mnt/c/Users/under/Documents/F5/3_Projects/Stroker_project/mlruns/314868173493193477/987d2b8feb2444159e96eb532d17df68/artifacts
+end_time: 1776868797587
+entry_point_name: ''
+experiment_id: '314868173493193477'
+lifecycle_stage: active
+run_id: 987d2b8feb2444159e96eb532d17df68
+run_name: RF_optuna_full_smote=False_feat=True
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1776868785907
+status: 3
+tags: []
+user_id: under

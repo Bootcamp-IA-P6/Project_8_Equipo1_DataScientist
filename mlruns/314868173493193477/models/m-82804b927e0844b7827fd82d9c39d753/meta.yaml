@@ -1,0 +1,10 @@
+artifact_location: file:///mnt/c/Users/under/Documents/F5/3_Projects/Stroker_project/mlruns/314868173493193477/models/m-82804b927e0844b7827fd82d9c39d753/artifacts
+creation_timestamp: 1776945626153
+experiment_id: '314868173493193477'
+last_updated_timestamp: 1776945630640
+model_id: m-82804b927e0844b7827fd82d9c39d753
+model_type: null
+name: model
+source_run_id: eb418d57cf9f4d43ac2e1a8417dc10ff
+status: 2
+status_message: null

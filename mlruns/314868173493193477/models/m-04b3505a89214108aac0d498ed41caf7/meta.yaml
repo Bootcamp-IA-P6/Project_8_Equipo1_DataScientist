@@ -1,0 +1,10 @@
+artifact_location: file:///mnt/c/Users/under/Documents/F5/3_Projects/Stroker_project/mlruns/314868173493193477/models/m-04b3505a89214108aac0d498ed41caf7/artifacts
+creation_timestamp: 1776868766524
+experiment_id: '314868173493193477'
+last_updated_timestamp: 1776868773568
+model_id: m-04b3505a89214108aac0d498ed41caf7
+model_type: null
+name: LR_optuna
+source_run_id: 774a236a140547df852b3e5deefa45d2
+status: 2
+status_message: null

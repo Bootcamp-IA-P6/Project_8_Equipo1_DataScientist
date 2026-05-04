@@ -2,7 +2,7 @@
 .env
 __pycache__
 .DS_Store
-
+.vscode
 
 # Created by https://www.toptal.com/developers/gitignore/api/python,jupyternotebooks,dotenv
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,jupyternotebooks,dotenv
@@ -16,6 +16,7 @@ __pycache__
 
 .ipynb_checkpoints
 */.ipynb_checkpoints/*
+
 
 # IPython
 profile_default/
@@ -32,6 +33,17 @@ __pycache__/
 
 # C extensions
 *.so
+
+# Jony
+02_modeling_vfin.ipynb
+/mlruns/modelos
+/mlruns/0
+02_modeling_final.ipynb
+03_optuna_v1.ipynb
+reports/
+pruebas.py
+data/cnn/**
+
 
 # Distribution / packaging
 .Python
@@ -193,3 +205,20 @@ poetry.toml
 pyrightconfig.json
 
 # End of https://www.toptal.com/developers/gitignore/api/python,jupyternotebooks,dotenv
+
+mlflow.db
+
+
+# Permitir entrar en la carpeta
+!mlruns/
+
+# Ignorar todo lo de dentro
+mlruns/163802690665606012/**
+mlruns/671783000064998482/**
+mlruns/801261444467686969/**
+mlruns/931021681281009593
+
+
+# 👉 PERMITIR SOLO ESTE EXPERIMENTO
+#!mlruns/314868173493193477/
+#mlruns/314868173493193477/**
