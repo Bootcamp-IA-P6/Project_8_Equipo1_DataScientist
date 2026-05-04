@@ -1,10 +1,6 @@
 # 🧠 Stroke Prediction AI System (ML + DL Hybrid)
 
-![Python](https://img.shields.io/badge/Python-3.10-blue)
-![MLflow](https://img.shields.io/badge/MLflow-Tracking-orange)
-![Docker](https://img.shields.io/badge/Docker-Containerized-blue)
-![Streamlit](https://img.shields.io/badge/Streamlit-Dashboard-red)
-![Status](https://img.shields.io/badge/Status-Deployment%20Ready-green)
+![Python](https://img.shields.io/badge/Python-3.10-blue) ![MLflow](https://img.shields.io/badge/MLflow-Tracking-orange) ![Docker](https://img.shields.io/badge/Docker-Containerized-blue) ![Streamlit](https://img.shields.io/badge/Streamlit-Dashboard-red) ![Status](https://img.shields.io/badge/Status-Deployment%20Ready-green)
 
 ---
 
@@ -19,6 +15,18 @@ This project is a **hybrid AI system** for stroke prediction combining:
 * 🌐 Streamlit clinical dashboard
 
 The system is designed to simulate a **real-world clinical triage pipeline**, prioritizing **recall over precision** due to the critical nature of stroke detection.
+
+---
+
+## 🚑 Why This Matters
+
+Stroke is a **time-critical condition** where missing a positive case can have severe consequences.
+
+👉 This system is designed to:
+
+* Maximize **early detection (high recall)**
+* Reduce **false positives using imaging validation**
+* Mimic **real clinical decision workflows**
 
 ---
 
@@ -57,26 +65,49 @@ This system follows a **sequential hybrid approach**:
 
 ---
 
-## 🧠 Problem Statement
+## 🏗️ System Architecture
 
-Stroke prediction dataset is highly imbalanced:
+```mermaid
+flowchart LR
 
-| Class     | Distribution |
-| --------- | ------------ |
-| No Stroke | 95%          |
-| Stroke    | 5%           |
+subgraph Data
+A[Clinical Data]
+B[MRI Images]
+end
 
-👉 This forces a **medical-oriented optimization strategy focused on recall**.
+subgraph Training
+C[ML Pipeline<br>Optuna + MLflow]
+D[DL Pipeline<br>EfficientNetB0]
+end
 
----
+subgraph Models
+E[XGBoost Model]
+F[CNN Model]
+end
 
-## 🔄 Processing Pipeline
+subgraph Application
+G[Streamlit Dashboard]
+end
 
+A --> C
+B --> D
+
+C --> E
+D --> F
+
+E --> G
+F --> G
 ```
-Data → Feature Engineering → ML Model → Thresholding → CNN Refinement → Output
-```
 
----
+The system is structured in 4 layers:
+
+* Data Layer → raw datasets
+* Training Layer → ML + DL pipelines
+* Model Layer → trained models
+* Application Layer → clinical dashboard
+
+> This modular design ensures scalability and separation of concerns
+
 
 ## 🎯 Key Results
 
@@ -87,6 +118,15 @@ Data → Feature Engineering → ML Model → Thresholding → CNN Refinement �
 | 🏆 XGBoost (Optuna) | **0.89** | **0.78** | **0.83** |
 
 > ✅ Optimized for **recall** (minimizing false negatives in stroke detection)
+
+---
+
+## 🧠 CNN Performance
+
+| Model          | AUC        | Recall | Precision  | F1         |
+| -------------- | ---------- | ------ | ---------- | ---------- |
+| Baseline CNN   | 0.9537     | 0.9720 | 0.6651     | 0.7898     |
+| EfficientNetB0 | **0.9618** | 0.9021 | **0.8269** | **0.8629** |
 
 ---
 
@@ -140,88 +180,19 @@ Grad-CAM visualizes which regions of the MRI influenced the CNN decision, improv
 
 ---
 
-## 🏗️ Architecture
+## 🧪 Testing & Quality
 
-```mermaid
-flowchart LR
+Run tests:
 
-subgraph Data
-A[Clinical Data]
-B[MRI Images]
-end
-
-subgraph Training
-C[ML Pipeline<br>Optuna + MLflow]
-D[DL Pipeline<br>EfficientNetB0]
-end
-
-subgraph Models
-E[XGBoost Model]
-F[CNN Model]
-end
-
-subgraph Application
-G[Streamlit Dashboard]
-end
-
-A --> C
-B --> D
-
-C --> E
-D --> F
-
-E --> G
-F --> G
+```bash
+pytest --cov=src --cov-report=html
 ```
 
----
+👉 Includes:
 
-The system is structured in 4 layers:
-
-* Data Layer → raw datasets
-* Training Layer → ML + DL pipelines
-* Model Layer → trained models
-* Application Layer → clinical dashboard
-
-👉 This modular design ensures scalability and separation of concerns
-
-## 📁 Project Structure
-
-```
-Stroker_project/
-├── app/                # API (deployment ready)
-├── src/                # ML pipeline (modular)
-├── cnn/                # Deep learning pipeline
-├── models/             # Trained models
-├── data/               # Datasets
-├── notebooks/          # Experiments & EDA
-├── assets/             # Visual results
-├── test/               # Unit tests
-├── mlruns/             # MLflow tracking
-```
-
----
-
-## ⚙️ Tech Stack
-
-* **ML:** Scikit-learn, XGBoost, Optuna
-* **DL:** TensorFlow / Keras (CNN, EfficientNet)
-* **MLOps:** MLflow, Docker, GitHub Actions
-* **Data:** Pandas, NumPy
-* **Visualization:** Matplotlib, Seaborn
-
----
-
-## 🏥 Clinical Perspective
-
-The system replicates a real hospital workflow:
-
-1. Initial screening using clinical data  
-2. MRI request only for high-risk cases  
-3. Image-based confirmation  
-4. Final decision support  
-
-> Designed as a **clinical decision support system**, not a replacement for doctors
+* data validation
+* feature engineering checks
+* model pipeline tests
 
 ---
 
@@ -243,6 +214,33 @@ Interactive interface for:
 
 ---
 
+## ⚙️ Tech Stack
+
+* **ML:** Scikit-learn, XGBoost, Optuna
+* **DL:** TensorFlow / Keras (CNN, EfficientNet)
+* **MLOps:** MLflow, Docker, GitHub Actions
+* **Data:** Pandas, NumPy
+* **Visualization:** Matplotlib, Seaborn
+
+---
+
+## 📁 Project Structure
+
+```
+Stroker_project/
+├── app/                # API (deployment ready)
+├── src/                # ML pipeline (modular)
+├── cnn/                # Deep learning pipeline
+├── models/             # Trained models
+├── data/               # Datasets
+├── notebooks/          # Experiments & EDA
+├── assets/             # Visual results
+├── test/               # Unit tests
+├── mlruns/             # MLflow tracking
+```
+---
+
+
 ## 🧪 How to Run
 
 ```bash
@@ -261,14 +259,6 @@ python app/app.py
 
 # Run tests
 pytest
-```
-
----
-
-## 🐳 Docker
-
-```bash
-docker-compose up --build
 ```
 
 ---
