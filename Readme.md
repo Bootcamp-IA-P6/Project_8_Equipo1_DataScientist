@@ -1,33 +1,79 @@
-# 🧠 Stroke Prediction AI
-
-### End-to-End Machine Learning & Deep Learning Project
-
-<p align="center">
+# 🧠 Stroke Prediction AI System (ML + DL Hybrid)
 
 ![Python](https://img.shields.io/badge/Python-3.10-blue)
-![ML](https://img.shields.io/badge/Machine%20Learning-Scikit--Learn-orange)
-![DL](https://img.shields.io/badge/Deep%20Learning-TensorFlow-red)
-![MLOps](https://img.shields.io/badge/MLOps-MLflow-blueviolet)
-![Status](https://img.shields.io/badge/Status-Production%20Ready-success)
-![License](https://img.shields.io/badge/License-MIT-green)
-
-</p>
+![MLflow](https://img.shields.io/badge/MLflow-Tracking-orange)
+![Docker](https://img.shields.io/badge/Docker-Containerized-blue)
+![Streamlit](https://img.shields.io/badge/Streamlit-Dashboard-red)
+![Status](https://img.shields.io/badge/Status-Deployment%20Ready-green)
 
 ---
 
 ## 🚀 Overview
 
-An **end-to-end AI system** to predict stroke risk using:
+This project is a **hybrid AI system** for stroke prediction combining:
 
-* 🧠 Structured clinical data (ML models)
-* 🖼️ Brain imaging (CNNs)
+* 🧮 Machine Learning (tabular clinical data)
+* 🧠 Deep Learning (MRI classification with CNN + EfficientNetB0)
+* 📊 MLflow experiment tracking
+* ⚙️ Optuna hyperparameter optimization
+* 🌐 Streamlit clinical dashboard
 
-Built with a **production-ready architecture**, including:
+The system is designed to simulate a **real-world clinical triage pipeline**, prioritizing **recall over precision** due to the critical nature of stroke detection.
 
-* Modular pipelines
-* Experiment tracking
-* CI/CD
-* Docker deployment
+---
+
+## 🧠 Hybrid Decision Pipeline
+
+```mermaid
+flowchart LR
+
+A[Patient Clinical Data] --> B["ML Model (XGBoost - High Recall)"]
+
+B --> C{Risk Evaluation}
+
+C -- Low Risk --> D[No Stroke]
+
+C -- High Risk --> E[Request MRI]
+
+E --> F["CNN (EfficientNetB0)"]
+
+B --> G[Clinical Score]
+F --> H[Imaging Score]
+
+G --> I[Weighted Combination]
+H --> I
+
+I --> J[Final Stroke Risk]
+```
+
+### 💡 Key Idea
+
+This system follows a **sequential hybrid approach**:
+
+* First, a **high-recall ML model** detects potential stroke cases
+* Then, a **CNN refines predictions using MRI**
+* Finally, both predictions are **combined using AUC-based weighting**
+
+---
+
+## 🧠 Problem Statement
+
+Stroke prediction dataset is highly imbalanced:
+
+| Class     | Distribution |
+| --------- | ------------ |
+| No Stroke | 95%          |
+| Stroke    | 5%           |
+
+👉 This forces a **medical-oriented optimization strategy focused on recall**.
+
+---
+
+## 🔄 Processing Pipeline
+
+```
+Data → Feature Engineering → ML Model → Thresholding → CNN Refinement → Output
+```
 
 ---
 
@@ -39,7 +85,36 @@ Built with a **production-ready architecture**, including:
 | Random Forest       | 0.86     | 0.75     | 0.80     |
 | 🏆 XGBoost (Optuna) | **0.89** | **0.78** | **0.83** |
 
-> ✅ Optimized for **recall**, critical in medical diagnosis.
+> ✅ Optimized for **recall** (minimizing false negatives in stroke detection)
+
+---
+
+## ⚖️ Model Combination Strategy
+
+Final prediction is computed as a weighted combination:
+
+```
+Final Risk = (XGBoost × 0.40) + (CNN × 0.60)
+```
+
+Weights are based on **model performance (AUC)**:
+
+* CNN has higher weight → better precision
+* XGBoost ensures high recall
+
+> This balances **sensitivity and specificity**, critical in clinical settings.
+
+---
+
+## 🏥 Clinical Perspective
+
+The system mimics a real-world diagnostic workflow:
+
+1. **Initial screening** using clinical variables
+2. **Secondary validation** using medical imaging
+3. **Risk scoring** to support medical decisions
+
+> Designed to assist—not replace—clinical judgment.
 
 ---
 
@@ -61,7 +136,43 @@ Built with a **production-ready architecture**, including:
 
 ## 🏗️ Architecture
 
-```id="arch01"
+```mermaid
+flowchart LR
+
+subgraph Data
+A[Clinical Data]
+B[MRI Images]
+end
+
+subgraph Training
+C[ML Pipeline<br>Optuna + MLflow]
+D[DL Pipeline<br>EfficientNetB0]
+end
+
+subgraph Models
+E[XGBoost Model]
+F[CNN Model]
+end
+
+subgraph Application
+G[Streamlit Dashboard]
+end
+
+A --> C
+B --> D
+
+C --> E
+D --> F
+
+E --> G
+F --> G
+```
+
+---
+
+## 📁 Project Structure
+
+```
 Stroker_project/
 ├── app/                # API (deployment ready)
 ├── src/                # ML pipeline (modular)
@@ -86,9 +197,27 @@ Stroker_project/
 
 ---
 
+## 🌐 Deployment
+
+https://project-8-equipo1-datascientist.onrender.com/
+
+---
+
+## 🎥 Demo (Clinical Dashboard)
+
+![demo](assets/demo.gif)
+
+Interactive interface for:
+
+* Patient data input
+* MRI upload (on-demand)
+* Risk scoring & recommendations
+
+---
+
 ## 🧪 How to Run
 
-```bash id="run01"
+```bash
 # Clone repo
 git clone https://github.com/your-username/stroke-prediction-ai.git
 cd stroke-prediction-ai
@@ -110,7 +239,7 @@ pytest
 
 ## 🐳 Docker
 
-```bash id="docker01"
+```bash
 docker-compose up --build
 ```
 
@@ -118,11 +247,11 @@ docker-compose up --build
 
 ## 📊 Experiment Tracking
 
-Using **MLflow**:
+Using **MLflow**, all experiments tracked with:
 
-* Track metrics (AUC, F1, Recall)
-* Compare experiments
-* Store models & artifacts
+* metrics: AUC, F1, recall, precision
+* parameters: Optuna + model configs
+* artifacts: confusion matrices, ROC curves
 
 ---
 
@@ -133,23 +262,19 @@ Using **MLflow**:
 ✔ Class imbalance handling (SMOTE)
 ✔ Model explainability (Grad-CAM)
 ✔ CI/CD integration
-✔ Production-ready structure
+✔ Deployment-ready structure
 
 ---
 
-## 📌 Future Improvements
+## 👨‍💻 Team
 
-* 🌐 Deploy API to cloud (AWS / GCP)
-* 📊 Add real-time monitoring
-* 🧠 Ensemble ML + CNN models
-* 📱 Build frontend dashboard
+**AI & Data Science Project** focused on real-world, production-ready machine learning systems.
 
----
-
-## 👨‍💻 Author
-
-**AI & Data Science Project**
-Focused on real-world, production-ready machine learning systems.
+| Name         | Role          |
+| ------------ | ------------- |
+| **Jonathan** | Scrum Master  |
+| **Iris**     | Product Owner |
+| **Gema**     | Developer     |
 
 ---
 
